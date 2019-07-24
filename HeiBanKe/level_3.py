@@ -1,4 +1,4 @@
-"""
+﻿"""
 黑板课爬虫闯关第三关
 这一关开始略有难度了
 首先必须先注册用户，登录后方可继续
@@ -19,7 +19,7 @@ def main():
     session.get(url_login)
     token = session.cookies['csrftoken']
     # 登录
-    session.post(url_login, data={'csrfmiddlewaretoken': token, 'username': 'guliang21', 'password': '123qwe'})
+    session.post(url_login, data={'csrfmiddlewaretoken': token, 'username': 'oo', 'password': 'xx'})
     for psd in range(30):
         print(f'test password {psd}')
         session.get(url)

@@ -1,4 +1,4 @@
-"""
+﻿"""
 黑板课爬虫闯关第四关
 密码一共100位，密码表中列出了每一位密码的值
 但是网站加了限制，密码表网页打开很慢，主要目的是为了让我们使用多线程
@@ -25,7 +25,7 @@ def main():
     session.get(url_login)
     token = session.cookies['csrftoken']
     # 登录
-    session.post(url_login, data={'csrfmiddlewaretoken': token, 'username': 'guliang21', 'password': '123qwe'})
+    session.post(url_login, data={'csrfmiddlewaretoken': token, 'username': 'oo', 'password': 'xx'})
     # 黑板客服务器15秒内最多响应2个请求，否则返回404.
     threadlist = [threading.Thread(target=getpw, args=(session,)) for _ in range(2)]
     for thread in threadlist:

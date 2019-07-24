@@ -1,4 +1,4 @@
-"""
+﻿"""
 黑板课爬虫闯关第五关
 验证码识别
 """
@@ -17,7 +17,7 @@ def main():
     session = requests.Session()
     session.get(url_login)
     token = session.cookies['csrftoken']
-    session.post(url_login, data={'csrfmiddlewaretoken': token, 'username': 'guliang21', 'password': '123qwe'})
+    session.post(url_login, data={'csrfmiddlewaretoken': token, 'username': 'oo', 'password': 'xx'})
     psd = 0
     while psd < 30:
         print(f'test password {psd}')
