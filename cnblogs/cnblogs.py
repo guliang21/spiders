@@ -4,15 +4,13 @@ import logging
 import re
 from dal import BlogViews, TotalViews, ScoreRank
 from datetime import date, timedelta
-import matplotlib.pyplot as plt
 
 
 log = logging.getLogger('cnblogs')
 log.setLevel(logging.DEBUG)
 log.addHandler(logging.StreamHandler())
 
-
-r1 = re.compile('@\s*(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}).*?阅读\((\d+)\)')
+r1 = re.compile('@\s*(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}).*?阅读\s*\((\d+)\)')
 r2 = re.compile('postid=(\d+)')
 
 cnblogs = []
@@ -33,7 +31,7 @@ def run(url):
         for title_div, info_div in zip(tab_postTitles, tab_postDescs):
             blog = BlogViews()
             blog.blogTitle = title_div.text.strip()
-            m = r1.search(info_div.text)
+            m = r1.search(info_div.text.strip())
             blog.createTime = m.group(1)
             blog.readCount = int(m.group(2))
             blog.postId = int(r2.search(info_div.find('a')['href']).group(1))
@@ -52,7 +50,7 @@ def run(url):
                 blog.save(force_insert=True)
             cnblogs.append(blog)
             log.debug(blog)
-    next_tab = soup.find('a', text='下一页')
+    next_tab = soup.find('a', text=re.compile("下一页"))
     if next_tab is not None:
         next_url = next_tab['href']
         run(next_url)
@@ -97,7 +95,7 @@ def show_sum():
 
     log.debug(f'总阅读量：{sum_count},    新增阅读量：{sum_new_count}')
 
-    get_score_rank('https://www.cnblogs.com/gl1573/mvc/blog/sidecolumn.aspx?blogApp=gl1573')
+    get_score_rank('https://www.cnblogs.com/gl1573/ajax/sidecolumn.aspx')
 
     log.debug('\n阅读排行榜：')
     for i, b in enumerate(sorted(cnblogs, key=sort_sum_count, reverse=True)[0: 10]):
