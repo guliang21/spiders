@@ -2,13 +2,8 @@
 
 import requests
 from bs4 import BeautifulSoup
-import logging
 import re
 from datetime import datetime
-
-log = logging.getLogger('cnblogs')
-log.setLevel(logging.DEBUG)
-log.addHandler(logging.StreamHandler())
 
 
 class Dal:
@@ -52,7 +47,7 @@ def run(url):
                 'ReadedCount': int(m.group(2))
             }
 
-            log.debug(f'{blog["Articleid"]} {blog["PublishTime"]} {blogReadedCount["ReadedCount"]} {blog["Title"]}')
+            print(f'{blog["Articleid"]} {blog["PublishTime"]} {blogReadedCount["ReadedCount"]} {blog["Title"]}')
 
             dal.SaveBlog(blog)
             dal.SaveBlogReadedCount(blogReadedCount)
