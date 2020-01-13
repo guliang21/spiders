@@ -18,9 +18,10 @@ class Dal:
 
 r1 = re.compile('@\s*(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}).*?阅读\s*\((\d+)\)')
 r2 = re.compile('postid=(\d+)')
+now = datetime.now()
 
 
-def run(url):
+def get_cnblogs(url):
     dal = Dal()
 
     html = requests.get(url).text
@@ -35,28 +36,58 @@ def run(url):
             m = r1.search(info_div.text.strip())
 
             blog = {
-                'Articleid': int(r2.search(info_div.find('a')['href']).group(1)),
+                'Articleid': 'b' + r2.search(info_div.find('a')['href']).group(1),
                 'PublishTime': m.group(1),
                 'Title': title_div.text.strip(),
                 'From': 'cnblogs'
             }
-
             blogReadedCount = {
-                'CollectTime': datetime.now(),
+                'CollectTime': now,
                 'Articleid': blog['Articleid'],
                 'ReadedCount': int(m.group(2))
             }
-
-            print(f'{blog["Articleid"]} {blog["PublishTime"]} {blogReadedCount["ReadedCount"]} {blog["Title"]}')
-
+            print(
+                f'{blog["Articleid"]:9}    {blog["PublishTime"]} {blogReadedCount["ReadedCount"]:7}    {blog["Title"]}')
             dal.SaveBlog(blog)
             dal.SaveBlogReadedCount(blogReadedCount)
 
     next_tab = soup.find('a', text=re.compile("下一页"))
     if next_tab is not None:
         next_url = next_tab['href']
-        run(next_url)
+        get_cnblogs(next_url)
+
+
+def get_csdn(url, index):
+    dal = Dal()
+
+    r = requests.get(url + str(index))
+    html = r.content.decode('utf-8')
+    soup = BeautifulSoup(html, 'lxml')
+
+    tab_blogs = soup.find('div', class_='article-list')
+    if tab_blogs:
+        for tab_blog in tab_blogs.find_all('div', recursive=False, class_='article-item-box'):
+            blog = {
+                'Articleid': 'c' + tab_blog['data-articleid'],
+                'PublishTime': tab_blog.find('span', class_='date').text.strip(),
+                'Title': tab_blog.find('a').text.replace('原创', '').strip(),
+                'From': 'csdn'
+            }
+            blogReadedCount = {
+                'CollectTime': now,
+                'Articleid': blog['Articleid'],
+                'ReadedCount': int(tab_blog.find('span', class_='num').text.strip())
+            }
+            print(
+                f'{blog["Articleid"]:10}    {blog["PublishTime"]} {blogReadedCount["ReadedCount"]:7}    {blog["Title"]}')
+            dal.SaveBlog(blog)
+            dal.SaveBlogReadedCount(blogReadedCount)
+
+        index += 1
+        get_csdn(url, index)
 
 
 if __name__ == '__main__':
-    run('https://www.cnblogs.com/gl1573/')
+    get_cnblogs('https://www.cnblogs.com/gl1573/')
+    get_csdn('https://blog.csdn.net/guliang21/article/list/', 1)
+
